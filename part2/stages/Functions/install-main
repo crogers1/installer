@@ -477,7 +477,7 @@ install_uivm()
         local KEY_FOLDER=`dirname ${UIVM_GCONF_VHD_KEY}`
         local UIVM_GCONF_DEV=`TAPDISK2_CRYPTO_KEYDIR=${KEY_FOLDER} tap-ctl create -a "vhd:/tmp/${VHD_FILENAME}"`
         if ! tap-ctl list | grep -q ${VHD_FILENAME}; then
-            tap-ctl destroy -d ${UIVM_GCONF_DEV} >&2
+			tap-ctl destroy -p $UIVM_GCONF_DEV_PID -m $UIVM_GCONF_DEV_TRUNC >&2
             rm -f ${UIVM_GCONF_VHD}.new >&2
             rm -f /tmp/${VHD_FILENAME}
             return 1
@@ -488,7 +488,7 @@ install_uivm()
         # We won't need it anymore.
         rm -f /tmp/${VHD_FILENAME}
         do_cmd sync >&2
-        tap-ctl destroy -d ${UIVM_GCONF_DEV} >&2
+		tap-ctl destroy -p $UIVM_GCONF_DEV_PID -m $UIVM_GCONF_DEV_TRUNC >&2
     fi
 }
 
@@ -589,14 +589,14 @@ create_rootfs_vhd()
 
         local DEV=$(tap-ctl create -a "vhd:${VHD}")
         if ! tap-ctl list | grep -q "${VHD}"; then
-            tap-ctl destroy -d ${DEV} >&2
+			tap-ctl destroy -p $UIVM_GCONF_DEV_PID -m $UIVM_GCONF_DEV_TRUNC >&2
             rm -f "${VHD}" >&2
             return 1
         fi
 
         write_rootfs ${IMG} ${IMG_TYPE} ${DEV} >&2 || return 1
 
-        tap-ctl destroy -d ${DEV} >&2 || return 1
+		tap-ctl destroy -p $UIVM_GCONF_DEV_PID -m $UIVM_GCONF_DEV_TRUNC >&2
     fi
 }
 
@@ -650,19 +650,19 @@ create_swap_vhd()
 
     local DEV=$(tap-ctl create -a "vhd:${VHD}")
     if ! tap-ctl list | grep -q "${VHD}" ; then
-        do_cmd tap-ctl destroy -d "${DEV}" >&2
+		do_cmd tap-ctl destroy -p $UIVM_GCONF_DEV_PID -m $UIVM_GCONF_DEV_TRUNC >&2
         rm -f "${VHD}" >&2
         return 1
     fi
 
     if ! do_cmd mkswap "${DEV}" >&2 ; then
-        do_cmd tap-ctl destroy -d "${DEV}" >&2
+		do_cmd tap-ctl destroy -p $UIVM_GCONF_DEV_PID -m $UIVM_GCONF_DEV_TRUNC >&2
         rm -f "${VHD}" >&2
         return 1
     fi
 
     do_cmd sync >&2
-    do_cmd tap-ctl destroy -d "${DEV}" >&2
+	do_cmd tap-ctl destroy -p $UIVM_GCONF_DEV_PID -m $UIVM_GCONF_DEV_TRUNC >&2
 }
 
 install_file()
