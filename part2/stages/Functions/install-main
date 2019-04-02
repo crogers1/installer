@@ -550,6 +550,8 @@ mount_upgrade_compat()
     do_mount -t tmpfs -o $tmpfsopts tmpfs ${UPGRADE_MOUNT}/tmp &&
     do_mount -o bind ${DOM0_MOUNT}/boot ${UPGRADE_MOUNT}/boot &&
     do_mount -o bind ${DOM0_MOUNT}/config ${UPGRADE_MOUNT}/config &&
+    do_mount -o bind ${DOM0_MOUNT}/etc/selinux/xc_policy/contexts/files/ ${UPGRADE_MOUNT}/etc/selinux/xc_policy/contexts/files/ &&
+    do_mount -o bind ${DOM0_MOUNT}/etc/xen/xenrefpolicy/policy/ ${UPGRADE_MOUNT}/etc/xen/xenrefpolicy/policy/ &&
     do_mount /dev/xenclient/boot ${UPGRADE_MOUNT}/boot/system &&
     if grep -qs "^securityfs " /proc/mounts ; then
         do_mount -o bind /sys/kernel/security ${UPGRADE_MOUNT}/sys/kernel/security ||
