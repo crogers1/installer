@@ -455,11 +455,15 @@ seal_system() {
                 do_cmd /etc/init.d/trousers stop >&2
                 do_cmd chroot ${DOM0_MOUNT} \
                     /usr/sbin/seal-system -f -r ${ROOT_DEV} >&2
+                SEAL_ERR=$?
                 do_cmd /etc/init.d/trousers start >&2
 
                 do_umount_all ${DOM0_MOUNT}
 
-                return 0
+                if [ ${SEAL_ERR} -eq 0 ]; then
+                    return 0
+                fi
+                return 1
             fi
 
             do_umount_all ${DOM0_MOUNT}

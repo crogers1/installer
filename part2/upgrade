@@ -116,6 +116,11 @@ EOF
 
     if [ "${RET}" -ne "${SUCCESS}" ] ; then
         echo "ERROR: Upgrade failed: '${SUBGRAPH_NAME}' returned ${RET}." >&2
+
+        # Catch forward seal error in upgrade case and propogate to updatemgr
+        if [ "${SUBGRAPH_NAME}" = "commit-main" ] && [ "${RET}" -eq 68 ]; then
+            exit 2
+        fi
         exit 1
     fi
 }
