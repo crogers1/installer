@@ -448,13 +448,22 @@ seal_system() {
             if is_mounted ${DOM0_MOUNT}/config ; then
                 echo "seal_system: /config is mounted, forward sealing key" >&2
 
+                # Determine before chrooting if we need to extend with pcr4 literal
+                # Always use the most recent seal-system.
+                ${DOM0_MOUNT}/usr/sbin/seal-system -l
+                if [ $? -eq 0 ]; then
+                    literal_arg="-L"
+                else
+                    literal_arg=""
+                fi
+
                 # Update config.pcrs in case it has changed
                 do_cmd chroot ${DOM0_MOUNT} \
                     sh -c '. /usr/lib/openxt/ml-functions ; write_config_pcrs' >&2
 
                 do_cmd /etc/init.d/trousers stop >&2
                 do_cmd chroot ${DOM0_MOUNT} \
-                    /usr/sbin/seal-system -f -r ${ROOT_DEV} >&2
+                    /usr/sbin/seal-system -f -D ${literal_arg} -r ${ROOT_DEV} >&2
                 SEAL_ERR=$?
                 do_cmd /etc/init.d/trousers start >&2
 
